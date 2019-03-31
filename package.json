@@ -1,23 +1,25 @@
 {
-  "name": "promisify-electron-ipc",
-  "version": "1.0.0",
-  "description": "Library to use promises for inter-process communication for electron.",
-  "main": "index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/D0miH/promisify-electron-ipc.git"
-  },
-  "author": "Dominik H. <https://github.com/D0miH>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/D0miH/promisify-electron-ipc/issues"
-  },
-  "homepage": "https://github.com/D0miH/promisify-electron-ipc#readme",
-  "devDependencies": {
-    "prettier": "^1.16.4",
-    "typescript": "^3.4.1"
-  }
+    "name": "promisify-electron-ipc",
+    "version": "1.0.0",
+    "description": "Library to use promises for inter-process communication for electron.",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/D0miH/promisify-electron-ipc.git"
+    },
+    "author": "Dominik H. <https://github.com/D0miH>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/D0miH/promisify-electron-ipc/issues"
+    },
+    "homepage": "https://github.com/D0miH/promisify-electron-ipc#readme",
+    "devDependencies": {
+        "prettier": "^1.16.4",
+        "typescript": "^3.4.1"
+    }
 }
