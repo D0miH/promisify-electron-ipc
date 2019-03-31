@@ -1,3 +1,7 @@
+# ignore the dist package
+dist/
+
+
 # Logs
 logs
 *.log
