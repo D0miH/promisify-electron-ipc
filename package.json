@@ -2,12 +2,22 @@
     "name": "promisify-electron-ipc",
     "version": "1.0.0",
     "description": "Library to use promises for inter-process communication for electron.",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
     "scripts": {
         "build": "tsc",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "jest --config jest.config.json",
+        "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+        "lint": "tslint -p tsconfig.json",
+        "prepare": "npm run build",
+        "prepublishOnly": "npm test && npm run lint",
+        "preversion": "npm run lint",
+        "version": "npm run format && git add -A src",
+        "postversion": "git push && git push --tags"
     },
+    "files": [
+        "lib/**/*"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/D0miH/promisify-electron-ipc.git"
@@ -19,7 +29,12 @@
     },
     "homepage": "https://github.com/D0miH/promisify-electron-ipc#readme",
     "devDependencies": {
+        "@types/jest": "^24.0.11",
+        "jest": "^24.5.0",
         "prettier": "^1.16.4",
+        "ts-jest": "^24.0.1",
+        "tslint": "^5.14.0",
+        "tslint-config-prettier": "^1.18.0",
         "typescript": "^3.4.1"
     }
 }
