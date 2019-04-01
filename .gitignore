@@ -1,6 +1,5 @@
-# ignore the dist package
-dist/
-
+# ignore the lib package
+lib/
 
 # Logs
 logs
