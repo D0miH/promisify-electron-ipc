@@ -1,5 +1,2 @@
-export class Greeter {
-    greet() {
-        return 'Hello';
-    }
-}
+export { default as promiseIpcRenderer } from './renderer';
+export { default as promiseIpcMain } from './main';
