@@ -3,43 +3,48 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { IpcMessageEvent } from 'electron';
 import { load } from 'proxyquire';
 import { v4 } from 'uuid';
-import { promiseIpcRenderer } from '..';
 import { PromisifiedIpcRenderer } from '../renderer';
 
 use(chaiAsPromised);
 
+// get the mocked ipcMain and ipcRenderer. In order for this to work require has to be used.
 // tslint:disable-next-line: no-var-requires
 const { ipcMain, ipcRenderer } = require('electron-ipc-mock')();
 
+// set a fixed uuid to use for the reply channel
 const uuid = v4();
 
-const renderer = load('../renderer.ts', {
+// get the default export which is already an instance of the class
+const promiseIpcRenderer = load('../renderer.ts', {
     electron: { ipcRenderer },
     uuid: { v4: () => uuid },
 }).default as PromisifiedIpcRenderer;
 
 describe('Renderer', () => {
-    it('is an instance of PromisifiedIpcRenderer', () => {
-        expect(promiseIpcRenderer).to.be.instanceOf(PromisifiedIpcRenderer);
-    });
-
-    it('sends a basic message', () => {
-        const replyChannel = 'testChannel' + uuid;
-
-        ipcMain.on('testChannel', (event: IpcMessageEvent) => {
-            event.sender.send(replyChannel, 0, 'testData');
+    describe('send', () => {
+        afterEach(() => {
+            ipcMain.removeAllListeners();
+            ipcRenderer.removeAllListeners();
         });
 
-        expect(renderer.send('testChannel')).to.eventually.equal('testData');
-    });
+        it('sends a basic message', () => {
+            const replyChannel = 'testChannel' + uuid;
 
-    it('rejects when error code is not 0', () => {
-        const replyChannel = 'testChannel' + uuid;
+            ipcMain.on('testChannel', (event: IpcMessageEvent) => {
+                event.sender.send(replyChannel, 0, 'testData');
+            });
 
-        ipcMain.on('testChannel', (event: IpcMessageEvent) => {
-            event.sender.send(replyChannel, 1, 'error');
+            expect(promiseIpcRenderer.send('testChannel')).to.eventually.equal('testData');
         });
 
-        expect(renderer.send('testChannel')).to.eventually.rejectedWith('error');
+        it('rejects when error code is not 0', () => {
+            const replyChannel = 'testChannel' + uuid;
+
+            ipcMain.on('testChannel', (event: IpcMessageEvent) => {
+                event.sender.send(replyChannel, 1, 'error');
+            });
+
+            expect(promiseIpcRenderer.send('testChannel')).to.eventually.rejectedWith('error');
+        });
     });
 });
