@@ -5,7 +5,8 @@
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
     "scripts": {
-        "build": "tsc",
+        "build": "mkdirp lib && babel src --out-dir lib --source-maps --extensions '.ts' && tsc --noEmit false --emitDeclarationOnly",
+        "check-types": "tsc",
         "test": "nyc mocha",
         "coverage": "nyc report --reporter=text-lcov | coveralls",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
@@ -42,6 +43,11 @@
     },
     "homepage": "https://github.com/D0miH/promisify-electron-ipc#readme",
     "devDependencies": {
+        "@babel/cli": "^7.4.3",
+        "@babel/core": "^7.4.3",
+        "@babel/plugin-proposal-class-properties": "^7.4.0",
+        "@babel/plugin-proposal-object-rest-spread": "^7.4.3",
+        "@babel/preset-typescript": "^7.3.3",
         "@types/chai": "^4.1.7",
         "@types/chai-as-promised": "^7.1.0",
         "@types/mocha": "^5.2.6",
