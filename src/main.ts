@@ -1,4 +1,5 @@
 import { ipcMain, IpcMessageEvent, WebContents } from 'electron';
+import serializeError from 'serialize-error';
 import { v4 } from 'uuid';
 
 export class PromisifiedIpcMain {
@@ -10,13 +11,11 @@ export class PromisifiedIpcMain {
     public on(channel: string, listener: (...args: any[]) => Promise<any>) {
         ipcMain.on(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
             Promise.resolve()
-                .then(() => {
-                    listener(...args);
-                })
+                .then(() => listener(...args))
                 .then((result: any) => {
                     event.sender.send(replyChannel, 0, result);
                 })
-                .catch((error: Error) => event.sender.send(replyChannel, 1, error));
+                .catch((error: Error) => event.sender.send(replyChannel, 1, serializeError(error)));
         });
     }
 

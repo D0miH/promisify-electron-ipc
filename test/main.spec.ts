@@ -3,7 +3,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { IpcMessageEvent, WebContents } from 'electron';
 import { load } from 'proxyquire';
 import { v4 } from 'uuid';
-import { PromisifiedIpcMain } from '../main';
+import { PromisifiedIpcMain } from '../src/main';
 
 use(chaiAsPromised);
 
@@ -15,7 +15,7 @@ const { ipcMain, ipcRenderer } = require('electron-ipc-mock')();
 const uuid = v4();
 
 // get the default export which is already an instance of the class
-const promiseIpcMain = load('../main.ts', {
+const promiseIpcMain = load('../src/main.ts', {
     electron: { ipcMain },
     uuid: { v4: () => uuid },
 }).default as PromisifiedIpcMain;
@@ -29,17 +29,37 @@ describe('MainProcess', () => {
             ipcRenderer.removeAllListeners();
         });
 
-        it('sends the result when the promise resolves', () => {
+        it('sends the result when the promise resolves', done => {
             // set the listener on the ipc main
-            promiseIpcMain.on('testChannel', () => Promise.resolve('resolved-promise-result'));
+            promiseIpcMain.on('testChannel', () => {
+                return Promise.resolve('resolved-promise-result');
+            });
 
-            // set the onetime listener on the ipc renderer to receive the result of the promise
+            // set the one time listener on the ipc renderer to receive the result of the promise
             ipcRenderer.once(replyChannel, (event: IpcMessageEvent, exitCode: number, result: any) => {
                 expect(exitCode).to.be.equal(0);
                 expect(result).to.be.equal('resolved-promise-result');
+                done();
             });
 
             // send a message to the ipc main
+            ipcRenderer.send('testChannel', replyChannel);
+        });
+
+        it('returns the error when rejecting the promise', done => {
+            // set the listener on the ipc main and return a rejected promise
+            promiseIpcMain.on('testChannel', () => {
+                throw new Error('error-message');
+            });
+
+            // set the one time listener on the ipc renderer to receive the result of the promise
+            ipcRenderer.once(replyChannel, (event: IpcMessageEvent, exitCode: number, result: any) => {
+                expect(exitCode).to.be.equal(1);
+                expect(result.message).to.be.equal('error-message');
+                done();
+            });
+
+            // send the message to the ipc main
             ipcRenderer.send('testChannel', replyChannel);
         });
     });

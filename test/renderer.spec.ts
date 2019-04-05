@@ -3,7 +3,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import { IpcMessageEvent, WebContents } from 'electron';
 import { load } from 'proxyquire';
 import { v4 } from 'uuid';
-import { PromisifiedIpcRenderer } from '../renderer';
+import { PromisifiedIpcRenderer } from '../src/renderer';
 
 use(chaiAsPromised);
 
@@ -15,7 +15,7 @@ const { ipcMain, ipcRenderer } = require('electron-ipc-mock')();
 const uuid = v4();
 
 // get the default export which is already an instance of the class
-const promiseIpcRenderer = load('../renderer.ts', {
+const promiseIpcRenderer = load('../src/renderer.ts', {
     electron: { ipcRenderer },
     uuid: { v4: () => uuid },
 }).default as PromisifiedIpcRenderer;
