@@ -49,13 +49,13 @@ describe('MainProcess', () => {
         it('returns the error when rejecting the promise', done => {
             // set the listener on the ipc main and return a rejected promise
             promiseIpcMain.on('testChannel', () => {
-                throw new Error('error-message');
+                throw new Error('error-message-on-ipc-main');
             });
 
             // set the one time listener on the ipc renderer to receive the result of the promise
             ipcRenderer.once(replyChannel, (event: IpcMessageEvent, exitCode: number, result: any) => {
                 expect(exitCode).to.be.equal(1);
-                expect(result.message).to.be.equal('error-message');
+                expect(result.message).to.be.equal('error-message-on-ipc-main');
                 done();
             });
 

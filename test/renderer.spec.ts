@@ -68,17 +68,35 @@ describe('Renderer', () => {
             });
         });
 
-        it('sends the result when the promise resolves', () => {
+        it('sends the result when the promise resolves', done => {
             // set the listener on the ipc renderer
-            promiseIpcRenderer.on('testChannel', () => Promise.resolve('resolve-promise-result'));
+            promiseIpcRenderer.on('testChannel', () => Promise.resolve('resolved-promise-result'));
 
             // set the one time listener on the ipc main to receive the result of the promise
             ipcMain.once(replyChannel, (event: IpcMessageEvent, exitCode: number, result: any) => {
                 expect(exitCode).to.be.equal(0);
-                expect(result.to.be.equal('resolved-promise-result'));
+                expect(result).to.be.equal('resolved-promise-result');
+                done();
             });
 
             // send a message to the ipc renderer
+            webContents.send('testChannel', replyChannel);
+        });
+
+        it('returns the error when rejecting the promise', done => {
+            // set the listener on the ipc renderer
+            promiseIpcRenderer.on('testChannel', () => {
+                throw new Error('error-message-on-ipc-renderer');
+            });
+
+            // set the one time listener on the ipc main to receive the result of the promise
+            ipcMain.once(replyChannel, (event: IpcMessageEvent, exitCode: number, result: any) => {
+                expect(exitCode).to.be.equal(1);
+                expect(result.message).to.be.equal('error-message-on-ipc-renderer');
+                done();
+            });
+
+            // send the message to the ipc renderer
             webContents.send('testChannel', replyChannel);
         });
     });

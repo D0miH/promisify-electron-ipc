@@ -1,4 +1,5 @@
 import { IpcMessageEvent, ipcRenderer } from 'electron';
+import serializeError from 'serialize-error';
 import { v4 } from 'uuid';
 
 export class PromisifiedIpcRenderer {
@@ -37,7 +38,7 @@ export class PromisifiedIpcRenderer {
             Promise.resolve()
                 .then(() => listener(...args))
                 .then((result: any) => event.sender.send(replyChannel, 0, result))
-                .catch((error: Error) => event.sender.send(replyChannel, 1, error));
+                .catch((error: Error) => event.sender.send(replyChannel, 1, serializeError(error)));
         });
     }
 }
