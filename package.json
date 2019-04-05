@@ -56,7 +56,6 @@
         "nyc": "^13.3.0",
         "prettier": "^1.16.4",
         "proxyquire": "^2.1.0",
-        "serialize-error": "^4.1.0",
         "sinon": "^7.3.1",
         "sinon-chai": "^3.3.0",
         "source-map-support": "^0.5.11",
@@ -68,5 +67,8 @@
     },
     "peerDependencies": {
         "electron": "^4.0.0"
+    },
+    "dependencies": {
+        "serialize-error": "^4.1.0"
     }
 }
