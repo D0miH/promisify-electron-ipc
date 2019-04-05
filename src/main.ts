@@ -1,6 +1,12 @@
-import { ipcMain, IpcMessageEvent } from 'electron';
+import { ipcMain, IpcMessageEvent, WebContents } from 'electron';
+import { v4 } from 'uuid';
 
 export class PromisifiedIpcMain {
+    /**
+     * Listens to a channel. When a new message arrives the listener function is called.
+     * @param channel The given channel to listen on.
+     * @param listener The function which is executed when receiving a message on the channel.
+     */
     public on(channel: string, listener: (...args: any[]) => Promise<any>) {
         ipcMain.on(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
             Promise.resolve()
@@ -10,7 +16,31 @@ export class PromisifiedIpcMain {
                 .then((result: any) => {
                     event.sender.send(replyChannel, 0, result);
                 })
-                .catch((error: any) => event.sender.send(replyChannel, 1, error));
+                .catch((error: Error) => event.sender.send(replyChannel, 1, error));
+        });
+    }
+
+    /**
+     * Sends a message on the given channel using the given web contents.
+     * @param channel The given channel to send on.
+     * @param webContents The web contents of the electron app.
+     * @param args The given arguments to send.
+     */
+    public send(channel: string, webContents: WebContents, ...args: any[]): Promise<any> {
+        const replyChannel = channel + v4();
+
+        return new Promise((resolve, reject) => {
+            // set one time listener on the reply channel
+            ipcMain.once(replyChannel, (event: IpcMessageEvent, exitCode: number, returnedData: any) => {
+                if (exitCode !== 0) {
+                    reject(returnedData);
+                }
+
+                resolve(returnedData);
+            });
+
+            // send the arguments on the given channel
+            webContents.send(channel, replyChannel, ...args);
         });
     }
 }
