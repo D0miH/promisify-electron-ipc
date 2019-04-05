@@ -6,7 +6,7 @@ export class PromisifiedIpcRenderer {
     /**
      * Sends a message on the given channel and returns a promise.
      * The promise resolves or rejects when the main process answered.
-     * @param channel The given channel to sned on.
+     * @param channel The given channel to send on.
      * @param args The given arguments to send.
      */
     public send(channel: string, ...args: any[]): Promise<any> {
