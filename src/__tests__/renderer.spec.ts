@@ -1,6 +1,6 @@
 import { expect, use } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { IpcMessageEvent } from 'electron';
+import { IpcMessageEvent, WebContents } from 'electron';
 import { load } from 'proxyquire';
 import { v4 } from 'uuid';
 import { PromisifiedIpcRenderer } from '../renderer';
@@ -45,6 +45,41 @@ describe('Renderer', () => {
             });
 
             return expect(promiseIpcRenderer.send('testChannel')).to.eventually.rejectedWith('error');
+        });
+    });
+
+    describe('on', () => {
+        let webContents: WebContents;
+        const replyChannel = 'testChannel' + uuid;
+
+        afterEach(() => {
+            ipcMain.removeAllListeners();
+            ipcRenderer.removeAllListeners();
+        });
+
+        before(() => {
+            // get the web content once by sending a dummy message from renderer to main
+            return new Promise(resolve => {
+                ipcMain.once('dummyChannel', (event: IpcMessageEvent) => {
+                    webContents = event.sender;
+                    resolve();
+                });
+                ipcRenderer.send('dummyChannel');
+            });
+        });
+
+        it('sends the result when the promise resolves', () => {
+            // set the listener on the ipc renderer
+            promiseIpcRenderer.on('testChannel', () => Promise.resolve('resolve-promise-result'));
+
+            // set the one time listener on the ipc main to receive the result of the promise
+            ipcMain.once(replyChannel, (event: IpcMessageEvent, exitCode: number, result: any) => {
+                expect(exitCode).to.be.equal(0);
+                expect(result.to.be.equal('resolved-promise-result'));
+            });
+
+            // send a message to the ipc renderer
+            webContents.send('testChannel', replyChannel);
         });
     });
 });

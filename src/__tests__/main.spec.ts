@@ -1,6 +1,6 @@
 import { expect, use } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { IpcMessageEvent } from 'electron';
+import { IpcMessageEvent, WebContents } from 'electron';
 import { load } from 'proxyquire';
 import { v4 } from 'uuid';
 import { PromisifiedIpcMain } from '../main';
@@ -41,6 +41,46 @@ describe('MainProcess', () => {
 
             // send a message to the ipc main
             ipcRenderer.send('testChannel', replyChannel);
+        });
+    });
+
+    describe('send', () => {
+        let webContents: WebContents;
+
+        afterEach(() => {
+            ipcRenderer.removeAllListeners();
+            ipcMain.removeAllListeners();
+        });
+
+        before(() => {
+            // get the web content once by sending a dummy message from renderer to main
+            return new Promise(resolve => {
+                ipcMain.once('dummyChannel', (event: IpcMessageEvent) => {
+                    webContents = event.sender;
+                    resolve();
+                });
+                ipcRenderer.send('dummyChannel');
+            });
+        });
+
+        it('sends a basic message', () => {
+            const replyChannel = 'testChannel' + uuid;
+
+            ipcRenderer.on('testChannel', (event: IpcMessageEvent) => {
+                event.sender.send(replyChannel, 0, 'testData');
+            });
+
+            return expect(promiseIpcMain.send('testChannel', webContents)).to.eventually.equal('testData');
+        });
+
+        it('rejects when error code is not 0', () => {
+            const replyChannel = 'testChannel' + uuid;
+
+            ipcRenderer.on('testChannel', (event: IpcMessageEvent) => {
+                event.sender.send(replyChannel, 1, 'error');
+            });
+
+            return expect(promiseIpcMain.send('testChannel', webContents)).to.eventually.rejectedWith('error');
         });
     });
 });
