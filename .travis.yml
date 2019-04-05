@@ -7,3 +7,6 @@ script:
     - npm test
 before_script:
     - npm run build
+# Update Coveralls
+after_script:
+    - npm run coverage
