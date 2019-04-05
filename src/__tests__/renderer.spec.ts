@@ -34,7 +34,7 @@ describe('Renderer', () => {
                 event.sender.send(replyChannel, 0, 'testData');
             });
 
-            expect(promiseIpcRenderer.send('testChannel')).to.eventually.equal('testData');
+            return expect(promiseIpcRenderer.send('testChannel')).to.eventually.equal('testData');
         });
 
         it('rejects when error code is not 0', () => {
@@ -44,7 +44,7 @@ describe('Renderer', () => {
                 event.sender.send(replyChannel, 1, 'error');
             });
 
-            expect(promiseIpcRenderer.send('testChannel')).to.eventually.rejectedWith('error');
+            return expect(promiseIpcRenderer.send('testChannel')).to.eventually.rejectedWith('error');
         });
     });
 });

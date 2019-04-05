@@ -14,6 +14,9 @@ export class PromisifiedIpcRenderer {
 
                 resolve(returnedData);
             });
+
+            // send the arguments on the given channel
+            ipcRenderer.send(channel, replyChannel, ...args);
         });
     }
 }
