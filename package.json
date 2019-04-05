@@ -62,13 +62,13 @@
         "ts-node": "^8.0.3",
         "tslint": "^5.14.0",
         "tslint-config-prettier": "^1.18.0",
-        "typescript": "^3.4.1",
-        "uuid": "^3.3.2"
+        "typescript": "^3.4.1"
     },
     "peerDependencies": {
         "electron": "^4.0.0"
     },
     "dependencies": {
-        "serialize-error": "^4.1.0"
+        "serialize-error": "^4.1.0",
+        "uuid": "^3.3.2"
     }
 }
