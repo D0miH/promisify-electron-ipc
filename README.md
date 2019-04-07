@@ -23,7 +23,7 @@ Sending messages from the renderer to the main process:
 // In the main process
 import { promiseIpcMain } from "promisify-electron-ipc";
 
-promiseIpcMain.on("promise-ipc-channel", name => {
+promiseIpcMain.on("greet-channel", name => {
     return Promise.resolve("Hello " + name);
 });
 ```
@@ -33,7 +33,7 @@ promiseIpcMain.on("promise-ipc-channel", name => {
 import { promiseIpcRenderer } from "promisify-electron-ipc";
 
 promiseIpcRenderer
-            .send("promise-ipc-channel", "Bob")
+            .send("greet-channel", "Bob")
             .then(answer => console.log(answer)); // prints "Hello Bob"
 ```
 
