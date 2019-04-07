@@ -33,8 +33,27 @@ promiseIpcMain.on("greet-channel", name => {
 import { promiseIpcRenderer } from "promisify-electron-ipc";
 
 promiseIpcRenderer
-            .send("greet-channel", "Bob")
-            .then(answer => console.log(answer)); // prints "Hello Bob"
+    .send("greet-channel", "Bob")
+    .then(answer => console.log(answer)); // prints "Hello Bob"
+```
+
+Sending messages from the main process to the renderer:
+```javascript
+// In the main process
+import { promiseIpcMain } from "promisify-electron-ipc";
+
+promiseIpcMain
+    .send("greet-channel", win.webContents, "Bob")
+    .then(answer => console.log(answer));
+```
+
+```javascript
+// In the renderer
+import { promiseIpcRenderer } from "promisify-electron-ipc";
+
+promiseIpcRenderer.on("greet-channel", name => {
+    return Promise.resolve("Hello " + name);
+});
 ```
 
 ## Credits
