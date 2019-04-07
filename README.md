@@ -16,6 +16,10 @@ or
 yarn add promisify-electron-ipc
 ```
 
+## Documentation
+
+You can find the documentation [here](https://d0mih.github.io/promisify-electron-ipc/).
+
 ## Usage
 Sending messages from the renderer to the main process:
 
