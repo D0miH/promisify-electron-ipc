@@ -1,6 +1,6 @@
 {
     "name": "promisify-electron-ipc",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "Library to use promises for inter-process communication for electron.",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
