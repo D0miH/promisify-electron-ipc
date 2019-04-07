@@ -1,6 +1,5 @@
 # ignore the lib package
 lib/
-docs/
 
 # Logs
 logs
