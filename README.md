@@ -16,6 +16,27 @@ or
 yarn add promisify-electron-ipc
 ```
 
+## Usage
+Sending messages from the renderer to the main process:
+
+```javascript
+// In the main process
+import { promiseIpcMain } from "promisify-electron-ipc";
+
+promiseIpcMain.on("promise-ipc-channel", name => {
+    return Promise.resolve("Hello " + name);
+});
+```
+
+```javascript
+// In the renderer
+import { promiseIpcRenderer } from "promisify-electron-ipc";
+
+promiseIpcRenderer
+            .send("promise-ipc-channel", "Bob")
+            .then(answer => console.log(answer)); // prints "Hello Bob"
+```
+
 ## Credits
 
 This library was inspired by [sibnerian](https://github.com/sibnerian/electron-promise-ipc)
