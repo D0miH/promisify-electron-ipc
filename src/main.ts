@@ -42,6 +42,39 @@ export class PromisifiedIpcMain {
             webContents.send(channel, replyChannel, ...args);
         });
     }
+
+    /**
+     * Listens to the channel once. The listener is removed after the first message is received.
+     * @param channel The given channel to listen on.
+     * @param listener The function which is executed when receiving a message on the channel.
+     */
+    public once(channel: string, listener: (...args: any[]) => Promise<any>) {
+        ipcMain.once(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
+            Promise.resolve()
+                .then(() => listener(...args))
+                .then((result: any) => {
+                    event.sender.send(replyChannel, 0, result);
+                })
+                .catch((error: Error) => event.sender.send(replyChannel, 1, serializeError(error)));
+        });
+    }
+
+    /**
+     * Removes the specified listener from the lsitener array of the specified channel.
+     * @param channel The given channel.
+     * @param listener The given listener on the channel.
+     */
+    public removeListener(channel: string, listener: (...args: any[]) => Promise<any>) {
+        ipcMain.removeListener(channel, listener);
+    }
+
+    /**
+     * Removes all listeners of the given channel.
+     * @param channel The given channel.
+     */
+    public removeAllListeners(channel: string) {
+        ipcMain.removeAllListeners(channel);
+    }
 }
 
 export default new PromisifiedIpcMain();
