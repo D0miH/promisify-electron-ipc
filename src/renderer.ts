@@ -3,6 +3,15 @@ import serializeError from 'serialize-error';
 import { v4 } from 'uuid';
 
 export class PromisifiedIpcRenderer {
+    private internalIpcRendererObject = ipcRenderer;
+
+    /**
+     * Returns the internal electron ipc renderer object.
+     */
+    get internalIpcRenderer() {
+        return this.internalIpcRendererObject;
+    }
+
     /**
      * Sends a message on the given channel and returns a promise.
      * The promise resolves or rejects when the main process answered.
@@ -14,16 +23,19 @@ export class PromisifiedIpcRenderer {
 
         return new Promise((resolve, reject) => {
             // set a one time listener on the reply channel
-            ipcRenderer.once(replyChannel, (event: IpcMessageEvent, exitCode: number, returnedData: any) => {
-                if (exitCode !== 0) {
-                    reject(returnedData);
-                }
+            this.internalIpcRendererObject.once(
+                replyChannel,
+                (event: IpcMessageEvent, exitCode: number, returnedData: any) => {
+                    if (exitCode !== 0) {
+                        reject(returnedData);
+                    }
 
-                resolve(returnedData);
-            });
+                    resolve(returnedData);
+                },
+            );
 
             // send the arguments on the given channel
-            ipcRenderer.send(channel, replyChannel, ...args);
+            this.internalIpcRendererObject.send(channel, replyChannel, ...args);
         });
     }
 
@@ -34,7 +46,7 @@ export class PromisifiedIpcRenderer {
      */
     public on(channel: string, listener: (...args: any[]) => Promise<any>) {
         // add the listener to the ipc renderer
-        ipcRenderer.on(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
+        this.internalIpcRendererObject.on(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
             Promise.resolve()
                 .then(() => listener(...args))
                 .then((result: any) => event.sender.send(replyChannel, 0, result))

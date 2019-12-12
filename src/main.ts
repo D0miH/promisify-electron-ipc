@@ -3,13 +3,22 @@ import serializeError from 'serialize-error';
 import { v4 } from 'uuid';
 
 export class PromisifiedIpcMain {
+    private internalIpcMainObject = ipcMain;
+
+    /**
+     * Returns the internal electron ipc main object.
+     */
+    get internalIpcMain() {
+        return this.internalIpcMainObject;
+    }
+
     /**
      * Listens to a channel. When a new message arrives the listener function is called.
      * @param channel The given channel to listen on.
      * @param listener The function which is executed when receiving a message on the channel.
      */
     public on(channel: string, listener: (...args: any[]) => Promise<any>) {
-        ipcMain.on(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
+        this.internalIpcMainObject.on(channel, (event: IpcMessageEvent, replyChannel: string, ...args: any[]) => {
             Promise.resolve()
                 .then(() => listener(...args))
                 .then((result: any) => {
@@ -30,13 +39,16 @@ export class PromisifiedIpcMain {
 
         return new Promise((resolve, reject) => {
             // set one time listener on the reply channel
-            ipcMain.once(replyChannel, (event: IpcMessageEvent, exitCode: number, returnedData: any) => {
-                if (exitCode !== 0) {
-                    reject(returnedData);
-                }
+            this.internalIpcMainObject.once(
+                replyChannel,
+                (event: IpcMessageEvent, exitCode: number, returnedData: any) => {
+                    if (exitCode !== 0) {
+                        reject(returnedData);
+                    }
 
-                resolve(returnedData);
-            });
+                    resolve(returnedData);
+                },
+            );
 
             // send the arguments on the given channel
             webContents.send(channel, replyChannel, ...args);
