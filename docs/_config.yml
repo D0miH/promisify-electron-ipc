@@ -1,4 +1,0 @@
-include:
-    - modules
-    - '_*_.html'
-    - '_*_.*.html'
