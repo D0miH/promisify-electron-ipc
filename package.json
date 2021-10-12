@@ -51,7 +51,7 @@
         "chai": "^4.2.0",
         "chai-as-promised": "^7.1.1",
         "coveralls": "^3.0.5",
-        "electron": "^4.2.8",
+        "electron": "^11.5.0",
         "electron-ipc-mock": "0.0.3",
         "mocha": "^6.2.0",
         "nyc": "^14.1.1",
